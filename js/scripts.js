@@ -239,9 +239,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         <span class="text-danger">${item.price}</span>
                         </div>
                         <div class="quantity-container">
-                            <button class="btn btn-outline-dark incrementBtn" data-id="${item.id}" type="button">+</button>
+                            <button class="btn btn-success incrementBtn" data-id="${item.id}" type="button">+</button>
                             <span id="quantityCounter">${item.quantity}</span>
-                            <button class="btn btn-outline-dark decrementBtn" data-id="${item.id}" type="button">-</button>
+                            <button class="btn btn-warning decrementBtn" data-id="${item.id}" type="button">-</button>
+                            <button class="btn btn-danger removeBtn ml-3" data-id="${item.id}" type="button">Remove</button>
+                        </div>
+                        <div class="text-center">
+                        
                         </div>
                     </li>
                 </ul>
@@ -255,6 +259,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 const itemId = item.id;
                 updateCartItemQuantity(itemId, false);
             });
+            itemDiv.querySelector('.removeBtn').addEventListener('click', () => {
+                const itemId = item.id;
+                removeCartItem(itemId); // Anropa funktionen för att ta bort varan från varukorgen
+            });
             cartItemsContainer.appendChild(itemDiv);
         });
         updateCartCounter(cart);
@@ -262,6 +270,13 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     
 
+    function removeCartItem(itemId) {
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+        cart = cart.filter(item => item.id !== itemId); // Filtrera bort varan med matchande ID
+        localStorage.setItem('cart', JSON.stringify(cart)); // Uppdatera varukorgen i localStorage
+        renderCartItems(); // Uppdatera varukorgen i gränssnittet
+    }
+    
     
 
     // Uppdatera cartCounter och räknar ut + skriver ut totalpriset
