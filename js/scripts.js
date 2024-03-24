@@ -271,7 +271,7 @@ document.addEventListener('DOMContentLoaded', function () {
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         if (cartCounter && totalPriceDisplay) {
             const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-            const totalPrice = cart.reduce((acc, item) => acc + (parseFloat(item.price.replace(/\D/g, '')) * item.quantity), 0);
+            const totalPrice = cart.reduce((acc, item) => acc + (parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity), 0).toFixed(2);
             cartCounter.innerText = totalQuantity.toString();
             totalPriceDisplay.innerText = "Total price: " + totalPrice + "$";
         }
@@ -302,7 +302,7 @@ function renderPurchasedItems() {
         const itemDiv = document.createElement('div');
         itemDiv.innerHTML = `
             <div class="container" id="orderFormItemContainer">
-                <h4>Your Purchased Items</h4>
+                <h4>Your Purchased Item</h4>
                 <ul class="list-group mb-3">
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
                         <div>
@@ -320,14 +320,14 @@ function renderPurchasedItems() {
         cartItemsContainer.appendChild(itemDiv);
 
         // Beräkna och lägg till det individuella priset för detta objekt till det totala priset
-        totalPrice += parseFloat(item.price.replace(/\D/g, '')) * item.quantity;
+        totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
     });
 
     // Visa det totala priset
     const totalPriceDisplay = document.createElement('div');
     totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
     totalPriceDisplay.textContent = `Total price: ${totalPrice}$`;
-    //totalPriceDisplay.innerText = `Total price: ${totalPrice}$`; // Visar priset med två decimaler
+   // totalPriceDisplay.innerText = `Total price: ${totalPrice}$`; // Visar priset med två decimaler
     cartItemsContainer.appendChild(totalPriceDisplay);
     
     document.getElementById('keepShoppingBtn').addEventListener('click', function () {
