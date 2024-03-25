@@ -342,7 +342,6 @@ function renderPurchasedItems() {
     const totalPriceDisplay = document.createElement('div');
     totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
     totalPriceDisplay.textContent = `Total price: ${totalPrice}$`;
-   // totalPriceDisplay.innerText = `Total price: ${totalPrice}$`; // Visar priset med två decimaler
     cartItemsContainer.appendChild(totalPriceDisplay);
     
     document.getElementById('keepShoppingBtn').addEventListener('click', function () {
