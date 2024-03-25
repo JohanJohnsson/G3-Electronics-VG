@@ -62,7 +62,6 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
 function displayAlert(message, inputField) {
     const alertDiv = document.createElement('div');
     alertDiv.classList.add('alert', 'alert-danger');
@@ -71,7 +70,6 @@ function displayAlert(message, inputField) {
 
     inputField.parentNode.insertBefore(alertDiv, inputField.nextSibling);
 }
-
 
 function removeAlerts() {
     const alerts = document.querySelectorAll('.alert-danger');
@@ -89,8 +87,6 @@ fetch("https://fakestoreapi.com/products/category/electronics")
             }
         });
     });
-
-
 
 function createCard(product) {
     const id = product.id;
@@ -151,21 +147,9 @@ function createCard(product) {
             // Om produkten redan finns i varukorgen, öka antalet med 1
             cart[existingItemIndex].quantity++;
         }
-        // Uppdatera räknaren för varukorgen och span-elementet
-        updateCartCounter(cart);
+
         localStorage.setItem('cart', JSON.stringify(cart));
     };
-
-    function updateCartCounter(cart) {
-        // Hämta räknarelementet
-        const cartCounter = document.getElementById('cartItemCount');
-        if (cartCounter) {
-            // Beräkna totala antalet produkter i varukorgen
-            const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-            // Uppdatera räknaren
-            cartCounter.innerText = totalQuantity.toString();
-        }
-    }
 
     cardBodyDiv.appendChild(cardTitle);
     cardBodyDiv.appendChild(cardText);
@@ -175,11 +159,28 @@ function createCard(product) {
     cardDiv.appendChild(img);
     cardDiv.appendChild(cardBodyDiv);
 
-
     const card = document.querySelector('#products');
     card.appendChild(cardDiv);
 };
 
+function updateCartSize() {
+    const cartItems = JSON.parse(window.localStorage.getItem("cart")) || [];
+    let totalCount = 0; // Totalt antal produkter i varukorgen
+
+    // Loopa igenom varje objekt i varukorgen och lägg till dess kvantitet i totalCount
+    cartItems.forEach(item => {
+        totalCount += item.quantity;
+    });
+
+    // Uppdatera varukorgsräknaren med det totala antalet produkter
+    const cartSizeDiv = document.getElementById("cartItemCount");
+    cartSizeDiv.innerHTML = totalCount;
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+    updateCartSize();
+    setInterval(updateCartSize, 100);
+});
 
 document.addEventListener('DOMContentLoaded', function () {
     // Hämta varukorgsdatan från localStorage
@@ -214,11 +215,10 @@ document.addEventListener('DOMContentLoaded', function () {
             renderCartItems();
         }
     }
-    
 
     // Skapar mina varukorgsprodukter
     function renderCartItems() {
-        cartItemsContainer.innerHTML = ''; // Clear the container to avoid duplicates
+        cartItemsContainer.innerHTML = '';
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
 
         cart.forEach(item => {
@@ -254,21 +254,22 @@ document.addEventListener('DOMContentLoaded', function () {
             itemDiv.querySelector('.incrementBtn').addEventListener('click', () => {
                 const itemId = item.id;
                 updateCartItemQuantity(itemId, true);
+                updateCartTotalPrice();
             });
             itemDiv.querySelector('.decrementBtn').addEventListener('click', () => {
                 const itemId = item.id;
                 updateCartItemQuantity(itemId, false);
+                updateCartTotalPrice();
             });
             itemDiv.querySelector('.removeBtn').addEventListener('click', () => {
                 const itemId = item.id;
-                removeCartItem(itemId); // Anropa funktionen för att ta bort varan från varukorgen
+                removeCartItem(itemId);
+                updateCartTotalPrice();
             });
             cartItemsContainer.appendChild(itemDiv);
         });
-        updateCartCounter(cart);
 
     }
-    
 
     function removeCartItem(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
@@ -276,37 +277,33 @@ document.addEventListener('DOMContentLoaded', function () {
         localStorage.setItem('cart', JSON.stringify(cart)); // Uppdatera varukorgen i localStorage
         renderCartItems(); // Uppdatera varukorgen i gränssnittet
     }
-    
-    
 
-    // Uppdatera cartCounter och räknar ut + skriver ut totalpriset
-    function updateCartCounter() {
-        const cartCounter = document.getElementById('cartItemCount');
-        const totalPriceDisplay = document.getElementById('totalPriceContainer');
-        const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        if (cartCounter && totalPriceDisplay) {
-            const totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-            const totalPrice = cart.reduce((acc, item) => acc + (parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity), 0).toFixed(2);
-            cartCounter.innerText = totalQuantity.toString();
-            totalPriceDisplay.innerText = "Total price: " + totalPrice + "$";
-        }
-    }
-
-    
+    updateCartTotalPrice();
     renderCartItems();
-
 
     document.getElementById('clearCartBtn').addEventListener('click', function () {
         localStorage.setItem('cart', JSON.stringify([]));
         document.getElementById('cartItemCount').textContent = '0';
         renderCartItems();
-        
-    });
-    
+        updateCartTotalPrice();
 
-    
+    });
+
 });
 
+function updateCartTotalPrice() {
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    let totalPrice = 0;
+
+    // Loopa igenom varje objekt i varukorgen och lägg till det individuella priset för varje produkt till det totala priset
+    cartItems.forEach(item => {
+        totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
+    });
+
+    // Uppdatera gränssnittet med det totala priset
+    const totalPriceDisplay = document.getElementById('totalPriceContainer');
+    totalPriceDisplay.textContent = "Total price: " + totalPrice.toFixed(2) + "$";
+}
 
 function renderPurchasedItems() {
     const cartItemsContainer = document.getElementById('purchasedItemsContainer');
@@ -341,37 +338,25 @@ function renderPurchasedItems() {
     // Visa det totala priset
     const totalPriceDisplay = document.createElement('div');
     totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
-    totalPriceDisplay.textContent = `Total price: ${totalPrice}$`;
+    totalPriceDisplay.textContent = `Total price: ${totalPrice.toFixed(2)}$`;
     cartItemsContainer.appendChild(totalPriceDisplay);
-    
+
     document.getElementById('keepShoppingBtn').addEventListener('click', function () {
-        console.log('Keep Shopping button clicked'); // Lägg till denna rad för att logga klickhändelsen
         // Rensa varukorgen
         localStorage.setItem('cart', JSON.stringify([]));
         // Återgå till startsidan eller valfri sida där du vill att användaren ska fortsätta shoppa
-        window.location.href = 'index.html'; 
+        window.location.href = 'index.html';
         // Uppdatera varukorgsräknaren
         document.getElementById('cartItemCount').textContent = '0';
-        
-        
+
     });
 
 }
-
-
 
 document.addEventListener('DOMContentLoaded', function () {
     renderPurchasedItems();
 });
 
-
-
 document.getElementById("cartButton").addEventListener("click", function () {
     window.location.href = "cart.html";
 });
-
-
-
-
-
-
