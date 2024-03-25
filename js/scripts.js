@@ -163,6 +163,8 @@ function createCard(product) {
     card.appendChild(cardDiv);
 };
 
+
+// Uppdaterar min räknare
 function updateCartSize() {
     const cartItems = JSON.parse(window.localStorage.getItem("cart")) || [];
     let totalCount = 0; // Totalt antal produkter i varukorgen
@@ -271,6 +273,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
+    // Tar bort en produkt från varukorgen
     function removeCartItem(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart = cart.filter(item => item.id !== itemId); // Filtrera bort varan med matchande ID
@@ -291,6 +294,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 });
 
+// Uppdaterar totalpriset i min varukorg
 function updateCartTotalPrice() {
     const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     let totalPrice = 0;
@@ -305,10 +309,11 @@ function updateCartTotalPrice() {
     totalPriceDisplay.textContent = "Total price: " + totalPrice.toFixed(2) + "$";
 }
 
+// Renderar mina köpta produkter
 function renderPurchasedItems() {
     const cartItemsContainer = document.getElementById('purchasedItemsContainer');
     const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let totalPrice = 0; // Totalpriset för alla inköpta objekt
+    let totalPrice = 0;
 
     cart.forEach(item => {
         const itemDiv = document.createElement('div');
@@ -335,19 +340,16 @@ function renderPurchasedItems() {
         totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
     });
 
-    // Visa det totala priset
+    // Visa det totala priset för de köpta varorna
     const totalPriceDisplay = document.createElement('div');
     totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
     totalPriceDisplay.textContent = `Total price: ${totalPrice.toFixed(2)}$`;
     cartItemsContainer.appendChild(totalPriceDisplay);
 
+    //Rensar varukorgen och återgår till startsidan
     document.getElementById('keepShoppingBtn').addEventListener('click', function () {
-        // Rensa varukorgen
         localStorage.setItem('cart', JSON.stringify([]));
-        // Återgå till startsidan eller valfri sida där du vill att användaren ska fortsätta shoppa
         window.location.href = 'index.html';
-        // Uppdatera varukorgsräknaren
-        document.getElementById('cartItemCount').textContent = '0';
 
     });
 
