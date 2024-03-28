@@ -7,7 +7,7 @@
 // Use this file to add JavaScript to your project
 
 document.addEventListener('DOMContentLoaded', function() {
-    if (window.location.pathname.includes("order-form.html")) {
+    if (window.location.pathname.includes("cart.html")) {
       const submitBtn = document.getElementById("submitBtn");
       submitBtn.addEventListener('click', function(event) {
         event.preventDefault();
@@ -63,20 +63,20 @@ document.addEventListener('DOMContentLoaded', function() {
   
       });
   }});
-
-function displayAlert(message, inputField) {
-    const alertDiv = document.createElement('div');
-    alertDiv.classList.add('alert', 'alert-danger');
-    alertDiv.setAttribute('role', 'alert');
-    alertDiv.textContent = message;
-
-    inputField.parentNode.insertBefore(alertDiv, inputField.nextSibling);
-}
-
-function removeAlerts() {
-    const alerts = document.querySelectorAll('.alert-danger');
-    alerts.forEach(alert => alert.remove());
-}
+  
+  function displayAlert(message, inputField) {
+      const alertDiv = document.createElement('div');
+      alertDiv.classList.add('alert', 'alert-danger');
+      alertDiv.setAttribute('role', 'alert');
+      alertDiv.textContent = message;
+  
+      inputField.parentNode.insertBefore(alertDiv, inputField.nextSibling);
+  }
+  
+  function removeAlerts() {
+      const alerts = document.querySelectorAll('.alert-danger');
+      alerts.forEach(alert => alert.remove());
+  }
 
 fetch("https://fakestoreapi.com/products/category/electronics")
     .then((res) => res.json())
@@ -187,6 +187,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 document.addEventListener('DOMContentLoaded', function () {
+    let cartItemsContainer = document.getElementById('cartItemsContainer');
+    if (cartItemsContainer) {
     // Hämta varukorgsdatan från localStorage
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     // Hämta behållaren där varukorgsartiklar ska visas
@@ -224,7 +226,6 @@ document.addEventListener('DOMContentLoaded', function () {
     function renderCartItems() {
         cartItemsContainer.innerHTML = '';
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-
         cart.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.innerHTML = `
@@ -293,10 +294,11 @@ document.addEventListener('DOMContentLoaded', function () {
         updateCartTotalPrice();
 
     });
-
+}
 });
 
-// Uppdaterar totalpriset i min varukorg
+
+
 function updateCartTotalPrice() {
     const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     let totalPrice = 0;
@@ -309,61 +311,66 @@ function updateCartTotalPrice() {
     // Uppdatera gränssnittet med det totala priset
     const totalPriceDisplay = document.getElementById('totalPriceContainer');
     if (totalPriceDisplay) {
-    totalPriceDisplay.textContent = "Total price: " + totalPrice.toFixed(2) + "$";
-    } else {
-        console.error("Element with id 'totalPriceContainer' not found.");
+        totalPriceDisplay.textContent = "Total price: " + totalPrice.toFixed(2) + "$";
     }
 }
 
-// Renderar mina köpta produkter
 function renderPurchasedItems() {
-    const cartItemsContainer = document.getElementById('purchasedItemsContainer');
-    const cart = JSON.parse(localStorage.getItem('cart')) || [];
-    let totalPrice = 0;
+    // Kolla om vi är på cart.html sidan innan vi fortsätter
+    if (window.location.pathname.includes("purchaseConfirmationPage.html")) {
+        const itemsContainer = document.getElementById('purchasedItemsContainer');
+        if (!itemsContainer) {
+            console.error("Element with id 'purchasedItemsContainer' not found.");
+            return;
+        }
+        const cart = JSON.parse(localStorage.getItem('cart')) || [];
+        let totalPrice = 0;
 
-    cart.forEach(item => {
-        const itemDiv = document.createElement('div');
-        itemDiv.innerHTML = `
-            <div class="container" id="orderFormItemContainer">
-                <h4>Your Purchased Item</h4>
-                <ul class="list-group mb-3">
-                    <li class="list-group-item d-flex justify-content-between lh-condensed">
-                        <div>
-                            <img src="${item.image}" alt="${item.title}" height="100"> 
-                        </div>
-                        <div>
-                            <h6 class="my-2">${item.title}</h6>
-                            <p class="text-muted text-end">${item.price}</p>
-                            <p class="text-muted text-end">Quantity: ${item.quantity}</p>
-                        </div>
-                    </li>
-                </ul>
-            </div>
-        `;
-        cartItemsContainer.appendChild(itemDiv);
+        cart.forEach(item => {
+            const itemDiv = document.createElement('div');
+            itemDiv.innerHTML = `
+                <div class="container" id="orderFormItemContainer">
+                    <h4>Your Purchased Item</h4>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item d-flex justify-content-between lh-condensed">
+                            <div>
+                                <img src="${item.image}" alt="${item.title}" height="100"> 
+                            </div>
+                            <div>
+                                <h6 class="my-2">${item.title}</h6>
+                                <p class="text-muted text-end">${item.price}</p>
+                                <p class="text-muted text-end">Quantity: ${item.quantity}</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            `;
+            itemsContainer.appendChild(itemDiv);
 
-        // Beräkna och lägg till det individuella priset för detta objekt till det totala priset
-        totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
-    });
+            // Beräkna och lägg till det individuella priset för detta objekt till det totala priset
+            totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
+        });
 
-    // Visa det totala priset för de köpta varorna
-    const totalPriceDisplay = document.createElement('div');
-    totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
-    totalPriceDisplay.textContent = `Total price: ${totalPrice.toFixed(2)}$`;
-    cartItemsContainer.appendChild(totalPriceDisplay);
+        // Visa det totala priset för de köpta varorna
+        const totalPriceDisplay = document.createElement('div');
+        totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
+        totalPriceDisplay.textContent = `Total price: ${totalPrice.toFixed(2)}$`;
+        itemsContainer.appendChild(totalPriceDisplay);
 
-    //Rensar varukorgen och återgår till startsidan
-    document.getElementById('keepShoppingBtn').addEventListener('click', function () {
-        localStorage.setItem('cart', JSON.stringify([]));
-        window.location.href = 'index.html';
-
-    });
-
+        //Rensar varukorgen och återgår till startsidan
+        document.getElementById('keepShoppingBtn').addEventListener('click', function () {
+            localStorage.setItem('cart', JSON.stringify([]));
+            window.location.href = 'index.html';
+        });
+    }
 }
 
+
 document.addEventListener('DOMContentLoaded', function () {
+    updateCartTotalPrice();
     renderPurchasedItems();
 });
+
 
 document.getElementById("cartButton").addEventListener("click", function () {
     window.location.href = "cart.html";
