@@ -3,8 +3,6 @@
 * Copyright 2013-2023 Start Bootstrap
 * Licensed under MIT (https://github.com/StartBootstrap/startbootstrap-shop-homepage/blob/master/LICENSE)
 */
-// This file is intentionally blank
-// Use this file to add JavaScript to your project
 
 document.addEventListener('DOMContentLoaded', function() {
     if (window.location.pathname.includes("cart.html")) {
@@ -138,15 +136,11 @@ function createCard(product) {
     btn.classList.add("btn", "btn-dark", "mt-auto");
     btn.textContent = "Add to cart";
     btn.onclick = function () {
-        // Hämta den aktuella varukorgen från localStorage
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
-        // Kolla om produkten redan finns i varukorgen
         const existingItemIndex = cart.findIndex(item => item.id === id);
         if (existingItemIndex === -1) {
-            // Om produkten inte redan finns i varukorgen, lägg till den med quantity = 1
             cart.push({ id, title, price, description, image, quantity: 1 });
         } else {
-            // Om produkten redan finns i varukorgen, öka antalet med 1
             cart[existingItemIndex].quantity++;
         }
 
@@ -166,17 +160,14 @@ function createCard(product) {
 };
 
 
-// Uppdaterar min räknare
 function updateCartSize() {
     const cartItems = JSON.parse(window.localStorage.getItem("cart")) || [];
-    let totalCount = 0; // Totalt antal produkter i varukorgen
+    let totalCount = 0;
 
-    // Loopa igenom varje objekt i varukorgen och lägg till dess kvantitet i totalCount
     cartItems.forEach(item => {
         totalCount += item.quantity;
     });
 
-    // Uppdatera varukorgsräknaren med det totala antalet produkter
     const cartSizeDiv = document.getElementById("cartItemCount");
     cartSizeDiv.innerHTML = totalCount;
 }
@@ -189,47 +180,35 @@ document.addEventListener("DOMContentLoaded", () => {
 document.addEventListener('DOMContentLoaded', function () {
     let cartItemsContainer = document.getElementById('cartItemsContainer');
     if (cartItemsContainer) {
-    // Hämta varukorgsdatan från localStorage
     let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
-    // Hämta behållaren där varukorgsartiklar ska visas
     const cartItemsContainer = document.getElementById('cartItemsContainer');
 
-    // Function to update quantity of an item in the cart
     function updateCartItemQuantity(itemId, increase) {
-        // Find the item in the cart
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         const index = cart.findIndex(item => item.id === itemId);
 
         if (index !== -1) {
-            // If the item is found
             if (increase) {
-                // Increase quantity if increase is true
                 cart[index].quantity++;
             } else {
-                // Decrease quantity if increase is false
                 if (cart[index].quantity > 1) {
-                    // Ensure quantity doesn't go below 1
                     cart[index].quantity--;
                 } else {
-                    // If quantity is 1, remove the item from the cart
                     cart.splice(index, 1);
                 }
             }
-            // Update the cart in localStorage
             localStorage.setItem('cart', JSON.stringify(cart));
-            // Re-render the cart items
             renderCartItems();
         }
     }
 
-    // Skapar mina varukorgsprodukter
     function renderCartItems() {
         cartItemsContainer.innerHTML = '';
         const cart = JSON.parse(localStorage.getItem('cart')) || [];
         cart.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.innerHTML = `
-            <div class="container" id="orderFormItemContainer">
+            <div class="container">
                 <h4></h4>
                 <ul class="list-group mb-3">
                     <li class="list-group-item d-flex justify-content-between lh-condensed">
@@ -276,12 +255,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     }
 
-    // Tar bort en produkt från varukorgen
     function removeCartItem(itemId) {
         let cart = JSON.parse(localStorage.getItem('cart')) || [];
-        cart = cart.filter(item => item.id !== itemId); // Filtrera bort varan med matchande ID
-        localStorage.setItem('cart', JSON.stringify(cart)); // Uppdatera varukorgen i localStorage
-        renderCartItems(); // Uppdatera varukorgen i gränssnittet
+        cart = cart.filter(item => item.id !== itemId);
+        localStorage.setItem('cart', JSON.stringify(cart));
+        renderCartItems();
     }
 
     updateCartTotalPrice();
@@ -303,12 +281,10 @@ function updateCartTotalPrice() {
     const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
     let totalPrice = 0;
 
-    // Loopa igenom varje objekt i varukorgen och lägg till det individuella priset för varje produkt till det totala priset
     cartItems.forEach(item => {
         totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
     });
 
-    // Uppdatera gränssnittet med det totala priset
     const totalPriceDisplay = document.getElementById('totalPriceContainer');
     if (totalPriceDisplay) {
         totalPriceDisplay.textContent = "Total price: " + totalPrice.toFixed(2) + "$";
@@ -316,7 +292,6 @@ function updateCartTotalPrice() {
 }
 
 function renderPurchasedItems() {
-    // Kolla om vi är på cart.html sidan innan vi fortsätter
     if (window.location.pathname.includes("purchaseConfirmationPage.html")) {
         const itemsContainer = document.getElementById('purchasedItemsContainer');
         if (!itemsContainer) {
@@ -329,7 +304,7 @@ function renderPurchasedItems() {
         cart.forEach(item => {
             const itemDiv = document.createElement('div');
             itemDiv.innerHTML = `
-                <div class="container" id="orderFormItemContainer">
+                <div class="container">
                     <h4>Your Purchased Item</h4>
                     <ul class="list-group mb-3">
                         <li class="list-group-item d-flex justify-content-between lh-condensed">
@@ -346,18 +321,10 @@ function renderPurchasedItems() {
                 </div>
             `;
             itemsContainer.appendChild(itemDiv);
-
-            // Beräkna och lägg till det individuella priset för detta objekt till det totala priset
-            totalPrice += parseFloat(item.price.replace(/[^0-9.]/g, '')) * item.quantity;
         });
 
-        // Visa det totala priset för de köpta varorna
-        const totalPriceDisplay = document.createElement('div');
-        totalPriceDisplay.classList.add('text-center', 'font-weight-bold', 'fs-4', 'text-danger');
-        totalPriceDisplay.textContent = `Total price: ${totalPrice.toFixed(2)}$`;
-        itemsContainer.appendChild(totalPriceDisplay);
+        updateCartTotalPrice();
 
-        //Rensar varukorgen och återgår till startsidan
         document.getElementById('keepShoppingBtn').addEventListener('click', function () {
             localStorage.setItem('cart', JSON.stringify([]));
             window.location.href = 'index.html';
